@@ -1,42 +1,42 @@
+"use client"
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import { server } from '../config/server';
 
+interface Post {
+  _id: string;
+  title: string;
+  excerpt: string;
+}
 
-import Link from "next/link";
-import ReactMarkdown from 'react-markdown'
-import {server} from '../config/server';
-// get posts from database
-async function getPosts() {
-  try {
-    const posts = await fetch(`${server}/api/posts`, {
-      next: {
-        revalidate: 60
+const BlogPage: React.FC = () => {
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch(`${server}/api/posts`, {
+          next: {
+            revalidate: 60,
+          },
+        });
+        const data = await res.json();
+        setPosts(data);
+      } catch (error) {
+        console.error(error);
       }
-    });
-    return await posts.json();
-  } catch (error) {
-    return [];
-  }
-}
+    };
 
-async function deletePost(id: any) {
-  try {
-    const posts = await fetch(`${server}/api/posts/${id}`, {
-      method: "DELETE"
-    });
-
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-const BlogPage = async () => {
-  const posts = await getPosts();
+    fetchPosts();
+  }, []);
 
   return (
     <div>
       <ul className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-        {posts.map((post: any) => (
+        {posts.map((post) => (
           <li
-            key={post.title}
+            key={post._id}
             className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'
           >
             <Link href={`/blog/${post._id}`}>
