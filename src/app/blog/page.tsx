@@ -1,26 +1,42 @@
+
+
 import Link from "next/link";
 import ReactMarkdown from 'react-markdown'
-import { GetServerSideProps, NextPage } from 'next';
-import { server } from '../config/server';
-
-interface Post {
-  _id: string;
-  title: string;
-  excerpt: string;
-  // Add other properties here if needed
+import {server} from '../config/server';
+// get posts from database
+async function getPosts() {
+  try {
+    const posts = await fetch(`${server}/api/posts`, {
+      next: {
+        revalidate: 60
+      }
+    });
+    return await posts.json();
+  } catch (error) {
+    return [];
+  }
 }
 
-interface BlogPageProps {
-  posts: Post[];
+async function deletePost(id: any) {
+  try {
+    const posts = await fetch(`${server}/api/posts/${id}`, {
+      method: "DELETE"
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-const BlogPage: NextPage<BlogPageProps> = ({ posts }) => {
+const BlogPage = async () => {
+  const posts = await getPosts();
+
   return (
     <div>
       <ul className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-        {posts.map((post) => (
+        {posts.map((post: any) => (
           <li
-            key={post._id}
+            key={post.title}
             className='bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'
           >
             <Link href={`/blog/${post._id}`}>
@@ -48,25 +64,6 @@ const BlogPage: NextPage<BlogPageProps> = ({ posts }) => {
       </ul>
     </div>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<BlogPageProps> = async () => {
-  try {
-    const res = await fetch(`${server}/api/posts`);
-    const posts: Post[] = await res.json();
-    return {
-      props: {
-        posts,
-      },
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      props: {
-        posts: [],
-      },
-    };
-  }
 };
 
 export default BlogPage;
