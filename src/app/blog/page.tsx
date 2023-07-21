@@ -16,7 +16,7 @@ const BlogPage: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`${server}/api/posts`, {
+        const res = await fetch(`./api/posts`, {
           next: {
             revalidate: 60,
           },
