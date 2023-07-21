@@ -11,7 +11,7 @@ async function getPosts() {
         revalidate: 60
       }
     });
-    return posts.json();
+    return await posts.json();
   } catch (error) {
     return [];
   }
