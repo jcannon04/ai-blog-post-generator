@@ -13,7 +13,6 @@ async function getPosts() {
     });
     return posts.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 }
