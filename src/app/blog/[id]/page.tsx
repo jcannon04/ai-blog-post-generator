@@ -1,8 +1,9 @@
 import ReactMarkdown from 'react-markdown'
 import Link from 'next/link'
+import {server} from '../../config/server';
 
 const getPost = async (id: any) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/posts/${id}`, {
+  const response = await fetch(`${server}/api/posts/${id}`, {
     next: {
       revalidate: 60,
     },

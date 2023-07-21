@@ -4,6 +4,7 @@ import { SetStateAction, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import MarkdownEditor from "react-markdown-editor-lite";
 import Link from "next/link";
+import {server} from '../../config/server';
 
 const AddPost = () => {
   const [title, setTitle] = useState("Blog Post Title");
@@ -17,7 +18,7 @@ const AddPost = () => {
     // Save the post to the database
     const excerpt = content.slice(0, 100) + "...";
     try {
-      let response = await fetch("http://localhost:3000/api/posts", {
+      let response = await fetch(`${server}/api/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -5,6 +5,7 @@ import MarkdownEditor from "react-markdown-editor-lite";
 import ReactMarkdown from "react-markdown";
 import LoadingPage from "@/app/loading";
 import Link from "next/link";
+import {server} from '../../config/server';
 
 export default function GeneratePage() {
   const [formValues, setFormValues] = useState({
@@ -55,7 +56,7 @@ export default function GeneratePage() {
     };
 
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch(`${server}/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +79,7 @@ export default function GeneratePage() {
     setIsLoading(true);
     const excerpt = content.slice(0, 100) + "...";
     try {
-      let post = await fetch("http://localhost:3000/api/posts", {
+      let post = await fetch(`${server}/api/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -189,6 +190,7 @@ export default function GeneratePage() {
                     name='structure'
                     className='w-full p-2 border border-gray-300 rounded h-32'
                     onChange={handleChange}
+                    placeholder={`Enter all subheadings for blog i.e. Introduction, body, conclusion `}
                   ></textarea>
                 </div>
 

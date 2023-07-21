@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import ReactMarkdown from 'react-markdown'
-
+import {server} from '../config/server';
 // get posts from database
 async function getPosts() {
   try {
-    const posts = await fetch(`http://localhost:3000/api/posts`, {
+    const posts = await fetch(`${server}/api/posts`, {
       next: {
         revalidate: 60
       }
@@ -14,12 +14,13 @@ async function getPosts() {
     return posts.json();
   } catch (error) {
     console.error(error);
+    return [];
   }
 }
 
 async function deletePost(id: any) {
   try {
-    const posts = await fetch(`http://localhost:3000/api/posts/${id}`, {
+    const posts = await fetch(`${server}/api/posts/${id}`, {
       method: "DELETE"
     });
 

@@ -4,14 +4,14 @@
 import { useState } from "react";
 import MarkdownIt from "markdown-it";
 import Image from "next/image";
-
+import {server} from '../config/server';
 const Test = () => {
   const [blogPostData, setBlogPostData]: any = useState(null);
   const [blogPostContent, setBlogPostContent] = useState("");
 
   const getBlogPost = async () => {
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch(`${server}/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

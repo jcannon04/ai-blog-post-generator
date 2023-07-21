@@ -11,7 +11,6 @@ export async function GET(request: any) {
 
         return NextResponse.json(posts);
     } catch (error : any) {
-        console.log(error.message)
         return NextResponse.error();
     }
 
@@ -27,7 +26,8 @@ export async function POST(request: Request) {
 
         return NextResponse.json(post);
 
-    } catch (error) {
+    } catch (error : any) {
+        console.log(error.message);
         return NextResponse.error();
     }
 

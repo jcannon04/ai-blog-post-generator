@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import {server} from '../config/server';
 
 export default function Home() {
   const [formValues, setFormValues] = useState({
@@ -37,7 +38,7 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch("/api/generate", {
+      const response = await fetch(`${server}/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
