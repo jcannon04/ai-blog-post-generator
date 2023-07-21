@@ -1,31 +1,46 @@
 "use client";
 
-import { useState } from "react";
-import MarkdownEditor from "react-markdown-editor-lite";
-import ReactMarkdown from "react-markdown";
-import LoadingPage from "@/app/loading";
-import Link from "next/link";
-import {server} from '../../config/server';
+import { useState, useEffect } from 'react';
+import MarkdownEditor from 'react-markdown-editor-lite';
+import ReactMarkdown from 'react-markdown';
+import LoadingPage from '@/app/loading';
+import Link from 'next/link';
+import { server } from '../../config/server';
+
+interface FormData {
+  topic: string;
+  keywords: string;
+  tone: string;
+  minwordcount: string;
+  maxwordcount: string;
+  structure: string;
+  audience: string;
+  related: string;
+}
+
+interface ApiResponse {
+  content: string;
+}
 
 export default function GeneratePage() {
-  const [formValues, setFormValues] = useState({
-    topic: "",
-    keywords: "",
-    tone: "",
-    minwordcount: "",
-    maxwordcount: "",
-    structure: "",
-    audience: "",
-    related: "",
+  const [formValues, setFormValues] = useState<FormData>({
+    topic: '',
+    keywords: '',
+    tone: '',
+    minwordcount: '',
+    maxwordcount: '',
+    structure: '',
+    audience: '',
+    related: '',
   });
 
   const [generated, setGenerated] = useState(false);
-  const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
-  const [id, setId] = useState("");
+  const [content, setContent] = useState('');
+  const [title, setTitle] = useState('');
+  const [id, setId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleTitleChange(event: any) {
+  function handleTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
     setTitle(event.target.value);
   }
 
@@ -33,7 +48,7 @@ export default function GeneratePage() {
     setContent(text);
   }
 
-  function handleChange(event: any) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
@@ -41,10 +56,10 @@ export default function GeneratePage() {
     }));
   }
 
-  async function onSubmit(event: any) {
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
-    let formData = {
+    const formData: FormData = {
       topic: formValues.topic,
       keywords: formValues.keywords,
       tone: formValues.tone,
@@ -57,14 +72,14 @@ export default function GeneratePage() {
 
     try {
       const response = await fetch(`${server}/api/generate`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const data: ApiResponse = await response.json();
       setContent(data.content);
       setTitle(formData.topic);
       setGenerated(true);
@@ -77,12 +92,12 @@ export default function GeneratePage() {
   const handleSave = async () => {
     // Save the post to the database
     setIsLoading(true);
-    const excerpt = content.slice(0, 100) + "...";
+    const excerpt = content.slice(0, 100) + '...';
     try {
       let post = await fetch(`${server}/api/posts`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ title, content, excerpt }),
       });
