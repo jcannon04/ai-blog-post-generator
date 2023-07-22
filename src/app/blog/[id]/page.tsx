@@ -1,28 +1,48 @@
-import ReactMarkdown from 'react-markdown'
-import Link from 'next/link'
+"use client";
+import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import LoadingPage from "@/app/loading";
+import Link from "next/link";
+interface Post {
+  _id: string;
+  title: string;
+  content: string;
+}
 
-
-const getPost = async (id: any) => {
-  const response = await fetch(`./api/posts/${id}`, {
-    next: {
-      revalidate: 60,
-    },
-  });
+const getPost = async (id: string): Promise<Post> => {
+  const response = await fetch(`/api/posts/${id}`);
   const post = await response.json();
   return post;
 };
 
 const BlogPost = async ({ params }: { params: any }) => {
+  const [post, setPost] = useState<Post | null>(null);
   const { id } = params;
-  const post = await getPost(id);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const fetchedPost = await getPost(id);
+        setPost(fetchedPost);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchPost();
+  }, [id]);
+
+  if (!post) {
+    return <LoadingPage />;
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-2">{post.title}</h1>
-      <div className="mb-4">
+    <div className='container mx-auto px-4 py-8'>
+      <h1 className='text-2xl font-bold mb-2'>{post.title}</h1>
+      <div className='mb-4'>
         <ReactMarkdown>{post.content}</ReactMarkdown>
       </div>
-      <Link href="/blog">
-        <button className="bg-gray-900 text-white px-4 py-2 rounded-md mt-4">
+      <Link href={`/blog`}>
+        <button className='mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
           Back to Blog
         </button>
       </Link>

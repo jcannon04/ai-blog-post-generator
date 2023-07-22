@@ -5,7 +5,7 @@ import MarkdownEditor from 'react-markdown-editor-lite';
 import ReactMarkdown from 'react-markdown';
 import LoadingPage from '@/app/loading';
 import Link from 'next/link';
-import { server } from '../../config/server';
+
 
 interface FormData {
   topic: string;
@@ -71,7 +71,7 @@ export default function GeneratePage() {
     };
 
     try {
-      const response = await fetch(`./api/generate`, {
+      const response = await fetch(`/api/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function GeneratePage() {
     setIsLoading(true);
     const excerpt = content.slice(0, 100) + '...';
     try {
-      let post = await fetch(`./api/posts`, {
+      let post = await fetch(`/api/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

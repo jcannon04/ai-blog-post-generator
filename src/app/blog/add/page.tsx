@@ -17,7 +17,7 @@ const AddPost = () => {
     // Save the post to the database
     const excerpt = content.slice(0, 100) + "...";
     try {
-      let response = await fetch(`./api/posts`, {
+      let response = await fetch(`/api/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
