@@ -1,44 +1,35 @@
 "use client";
-import { generatePost } from '@/utils/generateBlogPost';
-import { useState, useEffect } from 'react';
-import MarkdownEditor from 'react-markdown-editor-lite';
-import ReactMarkdown from 'react-markdown';
-import LoadingPage from '@/app/loading';
-import Link from 'next/link';
 
+import { generatePost } from "@/utils/generateBlogPost";
+import { generatePostImage } from "@/utils/generatePostImg";
 
-interface FormData {
-  topic: string;
-  keywords: string;
-  tone: string;
-  minwordcount: string;
-  maxwordcount: string;
-  structure: string;
-  audience: string;
-  related: string;
-}
-
-interface ApiResponse {
-  content: string;
-}
+import { useState } from "react";
+import MarkdownEditor from "react-markdown-editor-lite";
+import ReactMarkdown from "react-markdown";
+import LoadingPage from "@/app/loading";
+import Link from "next/link";
+import Image from "next/image";
+import IFormData from "@/types/IFormData";
 
 export default function GeneratePage() {
-  const [formValues, setFormValues] = useState<FormData>({
-    topic: '',
-    keywords: '',
-    tone: '',
-    minwordcount: '',
-    maxwordcount: '',
-    structure: '',
-    audience: '',
-    related: '',
+  const [formValues, setFormValues] = useState<IFormData>({
+    topic: "",
+    keywords: "",
+    tone: "",
+    minwordcount: "",
+    maxwordcount: "",
+    structure: "",
+    audience: "",
+    related: "",
   });
 
   const [generated, setGenerated] = useState(false);
-  const [content, setContent] = useState('');
-  const [title, setTitle] = useState('');
-  const [id, setId] = useState('');
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
+  const [id, setId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [generateImage, setGenerateImage] = useState(false);
+  const [imgURl, setImgUrl] = useState<string>("");
 
   function handleTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
     setTitle(event.target.value);
@@ -48,7 +39,11 @@ export default function GeneratePage() {
     setContent(text);
   }
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+  function handleChange(
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) {
     const { name, value } = event.target;
     setFormValues((prevFormValues) => ({
       ...prevFormValues,
@@ -59,7 +54,8 @@ export default function GeneratePage() {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
-    const formData: FormData = {
+
+    const formData: IFormData = {
       topic: formValues.topic,
       keywords: formValues.keywords,
       tone: formValues.tone,
@@ -71,16 +67,13 @@ export default function GeneratePage() {
     };
 
     try {
-      // const response = await fetch(`/api/generate`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData),
-      // });
-
-      // const data: ApiResponse = await response.json();
       const data = await generatePost(formData);
+      let imgURl = '';
+      if(generateImage) {
+        imgURl = await generatePostImage(formData);
+      }
+
+      setImgUrl(imgURl);
       setContent(data);
       setTitle(formData.topic);
       setGenerated(true);
@@ -91,14 +84,13 @@ export default function GeneratePage() {
   }
 
   const handleSave = async () => {
-    // Save the post to the database
     setIsLoading(true);
-    const excerpt = content.slice(0, 100) + '...';
+    const excerpt = content.slice(0, 100) + "...";
     try {
       let post = await fetch(`/api/posts`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ title, content, excerpt }),
       });
@@ -236,6 +228,18 @@ export default function GeneratePage() {
                   />
                 </div>
 
+                <div className='mb-4'>
+                  <label className='block font-medium mb-1 flex items-center'>
+                    <input
+                      type='checkbox'
+                      checked={generateImage}
+                      onChange={() => setGenerateImage(!generateImage)}
+                      className='mr-2 h-6 w-6 rounded-full border-gray-300 focus:ring-offset-0 focus:ring-0'
+                    />
+                    Include Feature Image
+                  </label>
+                </div>
+
                 <button
                   type='submit'
                   className='bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded'
@@ -258,6 +262,17 @@ export default function GeneratePage() {
                 onChange={handleContentChange}
                 renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
               />
+                            {imgURl && (
+                <div className='my-4'>
+                  <Image
+                    src={imgURl}
+                    alt='Generated Feature Image'
+                    className='max-w-full h-auto'
+                    height={1024}
+                    width={1024}
+                  />
+                </div>
+              )}
               <button
                 className='mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
                 onClick={handleSave}
@@ -275,7 +290,6 @@ export default function GeneratePage() {
           )}
         </main>
       )}
-   
     </div>
   );
 }
