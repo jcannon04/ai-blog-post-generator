@@ -1,5 +1,5 @@
 "use client";
-
+import { generatePost } from '@/utils/generateBlogPost';
 import { useState, useEffect } from 'react';
 import MarkdownEditor from 'react-markdown-editor-lite';
 import ReactMarkdown from 'react-markdown';
@@ -71,16 +71,17 @@ export default function GeneratePage() {
     };
 
     try {
-      const response = await fetch(`/api/generate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // const response = await fetch(`/api/generate`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(formData),
+      // });
 
-      const data: ApiResponse = await response.json();
-      setContent(data.content);
+      // const data: ApiResponse = await response.json();
+      const data = await generatePost(formData);
+      setContent(data);
       setTitle(formData.topic);
       setGenerated(true);
       setIsLoading(false);
